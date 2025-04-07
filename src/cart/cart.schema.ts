@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { v4 as uuidv4 } from 'uuid';
 
 export type CartDocument = Cart & Document;
 
@@ -8,7 +9,7 @@ export class Cart {
     @Prop({ required: true })
     userId: string;
 
-    @Prop({ required: true })
+    @Prop({ default: () => uuidv4() })
     itemId: string;
 
     @Prop()
