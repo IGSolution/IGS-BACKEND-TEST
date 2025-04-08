@@ -15,7 +15,7 @@ export class OrderService {
         return newOrder.save(); // Save the new order to the database
     }
 
-    async getOrderById(orderId: string): Promise<Order | null> { 
+    async getOrderById(orderId: string): Promise<Order | null> {
         return this.orderModel.findOne({ orderId }).exec(); // Find the order by its ID
     }
 
@@ -25,5 +25,13 @@ export class OrderService {
 
     async getAllOrders(): Promise<Order[]> {
         return this.orderModel.find().exec(); // Find all orders in the database
+    }
+
+    async updateOrderStatus(orderId: string, status: string): Promise<Order | null> {
+        return this.orderModel.findOneAndUpdate(
+            { orderId },
+            { status },
+            { new: true }
+        ).exec();
     }
 }

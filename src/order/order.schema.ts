@@ -4,6 +4,13 @@ import { v4 as uuidv4 } from 'uuid'; // Import uuid for generating unique order 
 
 export type OrderDocument = Order & Document;
 
+export enum OrderStatus {
+    Pending = 'Pending',
+    Preparing = 'Preparing',
+    OnTheWay = 'OnTheWay',
+    Delivered = 'Delivered',
+  }
+
 @Schema({ timestamps: true })
 export class Order {
     @Prop({ required: true })
@@ -13,13 +20,13 @@ export class Order {
     orderId: string;
 
     @Prop({ type: [Object], default: [] })
-    items: any[]; // you can type this more strictly if needed
+    items: any[];
 
     @Prop({ required: true })
     total: number;
 
-    @Prop({ default: 'pending' }) // or use enum
-    status: string;
+    @Prop({ enum: OrderStatus, default: OrderStatus.Pending })
+    status: OrderStatus;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);
