@@ -14,4 +14,16 @@ export class OrderService {
         const newOrder = new this.orderModel({ userId, items, total });
         return newOrder.save(); // Save the new order to the database
     }
+
+    async getOrderById(orderId: string): Promise<Order | null> { 
+        return this.orderModel.findOne({ orderId }).exec(); // Find the order by its ID
+    }
+
+    async getOrdersByUserId(userId: string): Promise<Order[]> {
+        return this.orderModel.find({ userId }).exec(); // Find all orders for the given user
+    }
+
+    async getAllOrders(): Promise<Order[]> {
+        return this.orderModel.find().exec(); // Find all orders in the database
+    }
 }
