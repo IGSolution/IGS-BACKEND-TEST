@@ -1,57 +1,67 @@
-import { Injectable, Query, Req } from '@nestjs/common';
+/* eslint-disable prettier/prettier */
+// /src/users/users.service.ts
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { User, UserDocument } from './schemas/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { InjectModel } from '@nestjs/mongoose';
-import { User } from 'src/auth/schema/user.schema';
-import { Model } from 'mongoose';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-  async findAllUsers(@Query() query) {
-    let { limit = 10, page = 1 } = query;
-    page = page || 1;
-    const skip = page ? (page - 1) * limit : 0;
-    let option = {};
-
-    const count = this.userModel
-      .find(option)
-      .sort({ updatedAt: -1 })
-      .countDocuments();
-
-    let pages = 0;
-    if ((await count) > 0) {
-      if (limit) {
-        pages = Math.ceil((await count) / limit);
-      } else {
-        pages = 1;
-      }
-    }
-
-    limit = limit - 0;
-    let next = { limit, page: page * 1 + 1 };
-    let previous = { limit, page: page * 1 + 1 };
-    let result = {next,previous};
-
-    if (page * 1 < pages) {
-      result.next = { limit, page: page * 1 + 1 };
-    }
-    if (page * 1 <= pages && page - 1 != 0) {
-      result.previous = { limit, page: page - 1 };
-    }
-
-    const user = await this.userModel.find(option)
-      .limit(limit * 1)
-      .skip(skip);
-    return ({ status: 'success', data: { ...result, count, pages, user } });
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+    const createdUser = new this.userModel({
+      ...createUserDto,
+      password: hashedPassword,
+      addresses: [],
+    });
+    return createdUser.save();
   }
 
-  findSingleUser(id: any) {
-    return this.userModel.findOne(id);
+  async findAll(): Promise<User[]> {
+    return this.userModel.find().exec();
   }
 
-  deleteUser(id: string) {
-    return this.userModel.findByIdAndDelete(id);
+  async findOneByEmail(email: string): Promise<User | undefined> {
+    return this.userModel.findOne({ email }).exec();
+  }
+
+  async findById(id: string): Promise<User | undefined> {
+    return this.userModel.findById(id).exec();
+  }
+
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User | null> {
+    return this.userModel
+      .findByIdAndUpdate(id, updateUserDto, { new: true })
+      .exec();
+  }
+
+  async addAddress(userId: string, address: string): Promise<User | null> {
+    const user = await this.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    if (!user.addresses.includes(address)) {
+      user.addresses.push(address);
+      return user.save();
+    }
+    return user;
+  }
+
+  async removeAddress(userId: string, address: string): Promise<User | null> {
+    const user = await this.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const addressIndex = user.addresses.indexOf(address);
+    if (addressIndex > -1) {
+      user.addresses.splice(addressIndex, 1);
+      return user.save();
+    }
+    return user;
   }
 }

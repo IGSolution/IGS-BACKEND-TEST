@@ -1,42 +1,59 @@
+/* eslint-disable prettier/prettier */
+// import { Module } from '@nestjs/common';
+// import { AuthService } from './auth.service';
+// import { AuthController } from './auth.controller';
+// import { MongooseModule } from '@nestjs/mongoose';
+// import { UserSchema } from './schema/user.schema';
+// import { PassportModule } from '@nestjs/passport';
+// import { ConfigService } from '@nestjs/config';
+// import { JwtModule } from '@nestjs/jwt';
+// import { JwtStrategy } from './strategy/jwt.strategy';
+// import { LocalStrategy } from './strategy/local.strategy';
+
+// @Module({
+//   imports:  [
+    
+//     //passport module registration
+//     PassportModule.register({defaultStrategy:'jwt'}),
+
+//    JwtModule.register({
+//     secret:"mysecretekey",
+//     signOptions:{expiresIn:"2d"}
+//    }),
+//     //user schema registration
+//     MongooseModule.forFeature([{name:'User',schema:UserSchema}])
+//   ],
+//   controllers: [AuthController],
+//   providers: [AuthService,LocalStrategy, JwtStrategy],
+//   exports:[JwtStrategy, PassportModule]
+// })
+// export class AuthModule {}
+
+// /src/auth/auth.module.ts
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { MongooseModule } from '@nestjs/mongoose';
-import { UserSchema } from './schema/user.schema';
+import { UsersModule } from '../users/users.module';
 import { PassportModule } from '@nestjs/passport';
-import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategy/jwt.strategy';
-import { LocalStrategy } from './strategy/local.strategy';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
-  imports:  [
-    
-    //passport module registration
-    PassportModule.register({defaultStrategy:'jwt'}),
-    /*
-    //jwt module registration
+  imports: [
+    UsersModule,
+    PassportModule,
     JwtModule.registerAsync({
-      inject:[ConfigService],
-      useFactory:(config:ConfigService) => {
-        return {
-          secret:config.get<string>("JWT_SECRET"),
-          signOptions:{
-            expiresIn: config.get<string | number>("JWT_EXPIRE")
-          }
-        }
-      }
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get<string>('jwt.secret'),
+        signOptions: { expiresIn: configService.get<string>('jwt.expiresIn') },
+      }),
+      inject: [ConfigService],
     }),
-    */
-   JwtModule.register({
-    secret:"mysecretekey",
-    signOptions:{expiresIn:"2d"}
-   }),
-    //user schema registration
-    MongooseModule.forFeature([{name:'User',schema:UserSchema}])
   ],
+  providers: [AuthService, JwtStrategy],
   controllers: [AuthController],
-  providers: [AuthService,LocalStrategy, JwtStrategy],
-  exports:[JwtStrategy, PassportModule]
+  exports: [AuthService],
 })
 export class AuthModule {}
