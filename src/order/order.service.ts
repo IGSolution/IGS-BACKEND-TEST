@@ -1,37 +1,70 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Order, OrderDocument } from './order.schema';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
+import { Db, ObjectId } from 'mongodb';
+// import { OrderStatus } from './order-status.enum';
+import { CreateOrderDto } from './Dto/create-order-dto';
+import { UpdateOrderStatusDto } from './Dto/update-order-status-dto';
+import { OrderStatus } from './order.schema';
 
 @Injectable()
 export class OrderService {
-    constructor(
-        @InjectModel(Order.name) // Inject the Order model into the service
-        private orderModel: Model<OrderDocument> // Mongoose model for Order
-    ) { }
+  constructor(
+    @Inject('MONGO_DB') private readonly db: Db, // Inject the MongoDB database connection
+  ) {}
 
-    async createOrder(userId: string, items: any[], total: number): Promise<Order> {
-        const newOrder = new this.orderModel({ userId, items, total });
-        return newOrder.save(); // Save the new order to the database
+  // Create a new order
+  async createOrder(createOrderDto: CreateOrderDto): Promise<any> {
+    const { userId, items } = createOrderDto;
+
+    // Calculate total cost
+    const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+    const newOrder = {
+      userId,
+      items,
+      total,
+      status: OrderStatus.Pending, // Set initial status to 'Pending'
+    };
+
+      const result = await this.db.collection('orders').insertOne(newOrder);
+      const insertedOrder = await this.db.collection('orders').findOne({ _id: result.insertedId });
+
+      return insertedOrder; // Return the inserted order
+  }
+
+  // Retrieve an order by its ID
+  async getOrderById(orderId: string): Promise<any> {
+    const order = await this.db.collection('orders').findOne({ orderId });
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+    return order;
+  }
+
+  // Retrieve all orders for a specific user
+  async getOrdersByUserId(userId: string): Promise<any[]> {
+    return this.db.collection('orders').find({ userId }).toArray();
+  }
+
+  // Retrieve all orders
+  async getAllOrders(): Promise<any[]> {
+    return this.db.collection('orders').find().toArray();
+  }
+
+  // Update the status of an order
+  async updateOrderStatus(orderId: string, updateOrderStatusDto: UpdateOrderStatusDto): Promise<any> {
+    const { status } = updateOrderStatusDto;
+
+    const result = await this.db.collection('orders').findOneAndUpdate(
+      { _id: new ObjectId(orderId) },
+      { $set: { status, updatedAt: new Date() } },
+      { returnDocument: 'after' }
+    );
+
+    if (!result || !result.value) {
+      throw new NotFoundException('Order not found');
     }
 
-    async getOrderById(orderId: string): Promise<Order | null> {
-        return this.orderModel.findOne({ orderId }).exec(); // Find the order by its ID
-    }
-
-    async getOrdersByUserId(userId: string): Promise<Order[]> {
-        return this.orderModel.find({ userId }).exec(); // Find all orders for the given user
-    }
-
-    async getAllOrders(): Promise<Order[]> {
-        return this.orderModel.find().exec(); // Find all orders in the database
-    }
-
-    async updateOrderStatus(orderId: string, status: string): Promise<Order | null> {
-        return this.orderModel.findOneAndUpdate(
-            { orderId },
-            { status },
-            { new: true }
-        ).exec();
-    }
+    return result.value;
+  }
 }

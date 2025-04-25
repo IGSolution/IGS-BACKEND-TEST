@@ -10,6 +10,9 @@ export class Cart {
     userId: string;
 
     @Prop({ default: () => uuidv4() })
+    cartId: string;
+
+    @Prop({ required: true })
     itemId: string;
 
     @Prop()
@@ -20,6 +23,12 @@ export class Cart {
 
     @Prop()
     quantity: number;
+
+    @Prop({ default: Date.now })
+    createdAt: Date;
+
+    @Prop({ default: Date.now })
+    updatedAt: Date;
 }
 
 export const CartSchema = SchemaFactory.createForClass(Cart);

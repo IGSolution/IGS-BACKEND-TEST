@@ -13,20 +13,26 @@ export enum OrderStatus {
 
 @Schema({ timestamps: true })
 export class Order {
-    @Prop({ required: true })
-    userId: string;
+  @Prop({ required: true })
+  userId: string;
 
-    @Prop({ default: () => uuidv4() })
-    orderId: string;
+  @Prop({ default: () => uuidv4() })
+  orderId: string;
 
-    @Prop({ type: [Object], default: [] })
-    items: any[];
+  @Prop({ type: [Object], default: [] })
+  items: any[];
 
-    @Prop({ required: true })
-    total: number;
+  @Prop({ required: true })
+  total: number;
 
-    @Prop({ enum: OrderStatus, default: OrderStatus.Pending })
-    status: OrderStatus;
+  @Prop({ enum: OrderStatus, default: OrderStatus.Pending })
+  status: OrderStatus;
+
+  @Prop({ default: Date.now })
+  createdAt: Date;
+
+  @Prop({ default: Date.now })
+  updatedAt: Date;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);

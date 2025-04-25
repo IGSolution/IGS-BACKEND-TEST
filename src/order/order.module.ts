@@ -4,10 +4,11 @@ import { OrderService } from './order.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Order, OrderSchema } from './order.schema';
 import { CartModule } from '../cart/cart.module';
+import { MongoDBModule } from 'src/database/database.module';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Order.name, schema: OrderSchema }]),
+    MongoDBModule,
     CartModule // Import the CartModule to use its services
   ],
   controllers: [OrderController],

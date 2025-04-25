@@ -1,18 +1,20 @@
 import { Controller, Post, Body, Param, Delete, Get } from '@nestjs/common';
 import { CartService } from './cart.service';
+import { AddToCartDto } from './Dto/add-to-cart-dto';
+import { RemoveFromCartDto } from './Dto/remove-from-cart.dto';
 
 @Controller('cart')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
-  @Post(':userId/add')
-  addItem(@Param('userId') userId: string, @Body() item: any) {
-    return this.cartService.addToCart(userId, item);
+  @Post('add')
+  addItem(@Body() dto: AddToCartDto) {
+    return this.cartService.addToCart(dto);
   }
 
-  @Delete(':userId/remove/:itemId')
-  removeItem(@Param('userId') userId: string, @Param('itemId') itemId: string) {
-    return this.cartService.removeFromCart(userId, itemId);
+  @Delete('remove/:itemId')
+  removeItem(@Body() dto: RemoveFromCartDto) {
+    return this.cartService.removeFromCart(dto);
   }
 
   @Get(':userId')
@@ -20,8 +22,8 @@ export class CartController {
     return this.cartService.getCart(userId);
     }
 
-    @Delete(':userId/clear')
-    clearCart(@Param('userId') userId: string) {
-        return this.cartService.clearCart(userId);
-    }
+  @Delete(':userId/clear')
+  clearCart(@Param('userId') userId: string) {
+      return this.cartService.clearCart(userId);
+  }
 }

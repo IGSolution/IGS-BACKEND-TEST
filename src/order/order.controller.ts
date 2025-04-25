@@ -1,14 +1,15 @@
 import { Body, Controller, Get, Param, Post  } from '@nestjs/common';
 import { OrderService } from './order.service'; // Import the OrderService
 import { Model } from 'mongoose';
+import { create } from 'domain';
 
 @Controller('order')
 export class OrderController {
     constructor(private readonly OrderService: OrderService) { } // Constructor for the OrderController, currently empty
 
-    @Post(':userId/create')
-    CreateOrder(@Param('userId') userId: string, @Body() items: any, @Body('total') total: number) {
-        return this.OrderService.createOrder(userId, items, total); // Call the createOrder method from OrderService
+    @Post('/create')
+    CreateOrder(@Body() createOrderDto: any) {
+        return this.OrderService.createOrder(createOrderDto); // Call the createOrder method from OrderService
     }
 
     @Get(':orderId')
