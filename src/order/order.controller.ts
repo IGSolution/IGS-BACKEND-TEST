@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Post  } from '@nestjs/common';
 import { OrderService } from './order.service'; // Import the OrderService
 import { Model } from 'mongoose';
 import { create } from 'domain';
+import { UpdateOrderStatusDto } from './Dto/update-order-status-dto';
 
 @Controller('order')
 export class OrderController {
@@ -9,21 +10,26 @@ export class OrderController {
 
     @Post('/create')
     CreateOrder(@Body() createOrderDto: any) {
-        return this.OrderService.createOrder(createOrderDto); // Call the createOrder method from OrderService
+        return this.OrderService.createOrder(createOrderDto); 
     }
 
     @Get(':orderId')
     getOrderById(@Param('orderId') orderId: string) {
-        return this.OrderService.getOrderById(orderId); // Call the getOrderById method from OrderService
+        return this.OrderService.getOrderById(orderId);
     }
 
     @Get('user/:userId')
     getOrdersByUserId(@Param('userId') userId: string) {
-        return this.OrderService.getOrdersByUserId(userId); // Call the getOrdersByUserId method from OrderService
+        return this.OrderService.getOrdersByUserId(userId);
     }
 
-    @Get('all')
+    @Get('/all')
     getAllOrders() {
-        return this.OrderService.getAllOrders(); // Call the getAllOrders method from OrderService
+        return this.OrderService.getAllOrders();
+    }
+
+    @Post('/update/:orderId')
+    updateOrderStatus(@Param('orderId') orderId: string, @Body() updateOrderStatusDto: UpdateOrderStatusDto) {
+        return this.OrderService.updateOrderStatus(orderId, updateOrderStatusDto);
     }
 }

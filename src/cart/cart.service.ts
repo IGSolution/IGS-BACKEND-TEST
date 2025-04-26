@@ -73,9 +73,9 @@ export class CartService {
 
     // Check if any items were deleted
     if (result.deletedCount === 0) {
-      throw new NotFoundException('No items to clear in the cart'); // Throw an exception if no items were deleted
+      throw new NotFoundException('No items to clear in the cart');
     }
 
-    return { message: 'Cart cleared successfully' }; // Return a success message
+    return { message: 'Cart cleared successfully' }; 
   }
 }

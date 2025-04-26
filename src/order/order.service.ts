@@ -60,15 +60,16 @@ export class OrderService {
     const { status } = updateOrderStatusDto;
 
     const result = await this.db.collection('orders').findOneAndUpdate(
-      { _id: new ObjectId(orderId) },
+      { orderId },
       { $set: { status, updatedAt: new Date() } },
       { returnDocument: 'after' }
     );
 
-    if (!result || !result.value) {
+    console.log(result);
+    if (!result) {
       throw new NotFoundException('Order not found');
     }
 
-    return result.value;
+    return result;
   }
 }
