@@ -8,7 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
-import { RestaurantModule } from './restaurant/restaurant.module';
+import { RestaurantsModule } from './restaurant/restaurant.module';
 
 
 @Module({
@@ -24,7 +24,7 @@ import { RestaurantModule } from './restaurant/restaurant.module';
     CartModule,
     OrderModule,
     AuthModule,
-    RestaurantModule,
+    RestaurantsModule
   ],
   controllers: [AppController],
   providers: [AppService],
