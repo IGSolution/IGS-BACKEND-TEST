@@ -234,7 +234,7 @@ export class RestaurantsService {
   ): Promise<RestaurantDocument> {
     const createdRestaurant = new this.restaurantModel({
       ...createRestaurantDto,
-      user: user.userId, // Store the userId
+      user: user.userId, 
       menu: [],
     });
     return createdRestaurant.save();
