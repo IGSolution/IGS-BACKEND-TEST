@@ -17,9 +17,9 @@ export class CartController {
     return this.cartService.removeFromCart(dto);
   }
 
-  @Get(':cartId')
-  getCart(@Param('cartId') userId: string) {
-    return this.cartService.getCart(userId);
+  @Get('/:cartId')
+  getCart(@Param('cartId') cartId: string) {
+    return this.cartService.getCart(cartId);
     }
 
   @Delete(':userId/clear')
