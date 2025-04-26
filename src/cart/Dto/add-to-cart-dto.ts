@@ -5,7 +5,7 @@ export class AddToCartDto {
   userId: string;
 
   @IsString()
-  itemId: string; // This refers to the menu or product ID
+  itemId: string;
 
   @IsInt()
   @Min(1)

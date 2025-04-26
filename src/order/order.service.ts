@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Inject } from '@nestjs/common';
 import { Db, ObjectId } from 'mongodb';
+import { v4 as uuidv4 } from 'uuid';
 // import { OrderStatus } from './order-status.enum';
 import { CreateOrderDto } from './Dto/create-order-dto';
 import { UpdateOrderStatusDto } from './Dto/update-order-status-dto';
@@ -20,10 +21,13 @@ export class OrderService {
     const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
     const newOrder = {
-      userId,
-      items,
-      total,
-      status: OrderStatus.Pending, // Set initial status to 'Pending'
+        userId,
+        orderId: uuidv4(),
+        items,
+        total,
+        status: OrderStatus.Pending,
+        createdAt: new Date(),
+        updatedAt: new Date(),
     };
 
       const result = await this.db.collection('orders').insertOne(newOrder);

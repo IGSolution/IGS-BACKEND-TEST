@@ -1,5 +1,5 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { Connection, Model } from 'mongoose';
+import { v4 as uuidv4 } from 'uuid';
 import { Cart, CartDocument, CartSchema } from './cart.schema'; // Import Cart and CartDocument types
 import { Db, ObjectId } from 'mongodb';
 import { AddToCartDto } from './Dto/add-to-cart-dto';
@@ -22,11 +22,14 @@ export class CartService {
 
     // Create cart item using menu item details
     const cartItem = {
-      userId: dto.userId,
-      itemId: dto.itemId,
-      name: menuItem.name,
-      price: menuItem.price,
-      quantity: dto.quantity,
+        userId: dto.userId,
+        cartId: uuidv4(),
+        itemId: dto.itemId,
+        name: menuItem.name,
+        price: menuItem.price,
+        quantity: dto.quantity,
+        createdAt: new Date(),
+        updatedAt: new Date(),
     };
 
     // Insert the cart item into the 'cart' collection
@@ -53,9 +56,9 @@ export class CartService {
     return cartItem.value; // Return the deleted cart item
   }
 
-  async getCart(userId: string): Promise<any[]> {
+  async getCart(cartId: string): Promise<any[]> {
     // Find all cart items for the given userId
-      const cartItems = await this.db.collection('cart').find({ userId }).toArray();
+    const cartItems = await this.db.collection('cart').find({ cartId: cartId }).toArray();
 
       // Check if the cart is empty
     if (cartItems.length === 0) {

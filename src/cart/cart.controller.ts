@@ -7,18 +7,18 @@ import { RemoveFromCartDto } from './Dto/remove-from-cart.dto';
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
-  @Post('add')
+  @Post('/add')
   addItem(@Body() dto: AddToCartDto) {
     return this.cartService.addToCart(dto);
   }
 
-  @Delete('remove/:itemId')
+  @Delete('/remove')
   removeItem(@Body() dto: RemoveFromCartDto) {
     return this.cartService.removeFromCart(dto);
   }
 
-  @Get(':userId')
-  getCart(@Param('userId') userId: string) {
+  @Get(':cartId')
+  getCart(@Param('cartId') userId: string) {
     return this.cartService.getCart(userId);
     }
 
