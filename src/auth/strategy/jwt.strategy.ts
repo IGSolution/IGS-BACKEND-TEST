@@ -1,39 +1,39 @@
 /* eslint-disable prettier/prettier */
-// /src/auth/strategies/jwt.strategy.ts
-import { ExtractJwt, Strategy } from 'passport-jwt';
-import { PassportStrategy } from '@nestjs/passport';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { UsersService } from '../../users/users.service';
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable prettier/prettier */
+import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { PassportStrategy } from "@nestjs/passport";
+import { ExtractJwt, Strategy } from "passport-jwt";
+import { User } from "../schema/user.schema";
+import { Model } from "mongoose";
 
-export interface JwtPayload {
-  email: string;
-  userId: string;
-  role: string; //  Include role in the payload
-}
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(
-    private configService: ConfigService,
-    private usersService: UsersService,
-  ) {
-    super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      ignoreExpiration: false,
-      secretOrKey: configService.get<string>('jwt.secret'),
-    });
-  }
+export class JwtStrategy extends PassportStrategy(Strategy){
 
-  async validate(payload: JwtPayload) {
-    const user = await this.usersService.findById(payload.userId);
-    if (!user) {
-      throw new UnauthorizedException();
+    constructor(
+        @InjectModel(User.name)
+        private userModel:Model<User>
+    ) {
+        super({
+            jwtFromRequest:ExtractJwt.fromAuthHeaderAsBearerToken(),
+            // ignoredExpiration:false,
+            // secretOrkey: process.env.JWT_SECRET
+            secretOrKey:"mysecretekey"
+        });
+        
     }
-    return {
-      userId: payload.userId,
-      email: payload.email,
-      role: payload.role, // Return the role
-    };
-  }
+    async validate(payload:any) {
+
+        const {id} = payload;
+        console.log("got to jwt strategy",process.env.JWT_SECRET);
+
+        const user =await this.userModel.findById(id);
+        if(!user) {
+            throw new UnauthorizedException("You need to login to access this resource")
+        }
+        return user;
+
+    }
 }

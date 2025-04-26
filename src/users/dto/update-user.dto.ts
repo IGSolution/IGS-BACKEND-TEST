@@ -1,9 +1,5 @@
 /* eslint-disable prettier/prettier */
-// /src/users/dto/update-user.dto.ts
-import { IsString, IsOptional } from 'class-validator';
+import { PartialType } from '@nestjs/mapped-types';
+import { CreateUserDto } from './create-user.dto';
 
-export class UpdateUserDto {
-  @IsOptional()
-  @IsString()
-  name?: string;
-}
+export class UpdateUserDto extends PartialType(CreateUserDto) {}
