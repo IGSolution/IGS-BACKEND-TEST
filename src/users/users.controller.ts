@@ -4,8 +4,10 @@ import { Controller, Post, Body, Patch, UseGuards, Request, Get, Param } from '@
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { JwtPayload } from '../auth/strategies/jwt.strategy';
+import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
+import { JwtPayload } from 'src/auth/strategy/jwt.strategy';
+// import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+// import { JwtPayload } from '../auth/strategies/jwt.strategy';
 
 @Controller('users')
 export class UsersController {
