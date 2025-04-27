@@ -49,11 +49,11 @@ export class CartService {
     });
 
     // Check if the cart item was found and deleted
-    if (!cartItem || !cartItem.value) {
+    if (!cartItem) {
       throw new NotFoundException('Cart item not found');
     }
 
-    return cartItem.value; // Return the deleted cart item
+    return cartItem;
   }
 
   async getCart(cartId: string): Promise<any[]> {
